@@ -1,0 +1,31 @@
+stages:
+  - test
+acceptance_tests:
+  stage: test
+  only:
+    - image
+  before_script:
+    - pwd
+    - echo "RODANDO PIPELINE DE TESTES"
+    - cat /etc/os-release
+    - dpkg --print-architecture 
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - git clone https://$USER:$PASS@gitlab.com/$USER/tests-automation-hello-world-java.git
+    #    Installing requirements
+    - cd tests-automation-hello-world-java/requirements
+    - dpkg --install libasound2-data_1.1.8-1_all.deb
+    - dpkg --install libasound2_1.1.8-1_amd64.deb
+    - dpkg -i jdk-15.0.1_linux-x64_bin.deb
+    - export JAVA_HOME=/usr/lib/jvm/jdk-15.0.1
+    - export PATH=$JAVA_HOME/bin:$PATH
+    - java -version
+    - cd /builds/$USER/tests-automation-hello-world-java/tests-automation-hello-world-java/requirements
+    - tar -xzvf apache-maven-3.6.3-bin.tar.gz
+    - export PATH=/builds/$USER/tests-automation-hello-world-java/tests-automation-hello-world-java/requirements/apache-maven-3.6.3/bin:$PATH
+    - mvn -v
+    #    Run cucumber test
+    - cd /builds/$USER/tests-automation-hello-world-java
+    - cd tests-automation-hello-world-java
+    - mvn -f pom.xml
